@@ -10,3 +10,29 @@ PLUGIN_TF_VERSION=2.1108.0
  
 they should also be terraform variables.
 
+
+---
+
+## Session context (as built, 2026-10-12)
+
+Implemented the above as Terraform using the `harness/harness` provider (`harness_platform_workspace`, `for_each` over `var.environments`). Validated with `terraform validate` and a dummy-credential `plan` (4 to add). Nothing applied.
+
+### Files
+- `versions.tf` – provider + required versions; provider auth via `harness_endpoint`, `harness_account_id`, `harness_platform_api_key` (sensitive).
+- `variables.tf` – all inputs (below).
+- `main.tf` – `local.plugin_env_vars` map of the 5 PLUGIN vars, applied to every workspace through a `dynamic "environment_variable"` block (`value_type = "string"`). Per the original request the PLUGIN values are env vars, not the provider's `provisioner_config` block.
+- `outputs.tf` – `workspace_identifiers` map (env => identifier).
+- `terraform.tfvars.example` – copy to `terraform.tfvars` (gitignored).
+- `.gitignore` – Terraform state, `.terraform/`, `*.tfvars`, plans, overrides; keeps `*.tfvars.example` and `.terraform.lock.hcl`.
+
+### Variables
+- Naming: `workspace_name` (required, no default) + `environments` (default `["dev","test","uat","prod"]`) → identifier/name `<workspace_name>_<env>`.
+- Scope: `org_id` (default `default`), `project_id` (default `technical_exercise`).
+- Repo: `repository`, `repository_branch`, `repository_path`, `repository_connector`, `provider_connector` (AWS connector) – all default `null`; must be supplied before apply. `repository_commit`/`repository_sha` intentionally not exposed (conflict with branch).
+- Other: `provisioner_type` (default `awscdk`), `provisioner_version` (null), `cost_estimation_enabled` (false).
+- PLUGIN vars: `plugin_awscdk_language` (python), `plugin_awscdk_language_version` (3.11), `plugin_awscdk_package_manager` (pip), `plugin_awscdk_package_manager_version` (22.3), `plugin_tf_version` (2.1108.0).
+
+### Notes
+- Pass the API key via `export TF_VAR_harness_platform_api_key="$claudekey"`; never put it in a file. Account ID: `WqS38aeyQjayoqy6mzwceA`.
+- Still needed before apply: `workspace_name`, repo/connector values, `provider_connector`. Confirm with the user before `terraform apply`.
+- Git: repo is `lorenyeung/terraform-iacm-cdk-workspace`, branch `main`; `.gitignore` was created but not committed.
