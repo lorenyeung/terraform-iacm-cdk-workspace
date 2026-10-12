@@ -1,0 +1,28 @@
+# Copy to terraform.tfvars and edit.
+# Pass the API key via env instead of this file: export TF_VAR_harness_platform_api_key="$claudekey"
+
+harness_account_id = "WqS38aeyQjayoqy6mzwceA"
+org_id             = "default"
+project_id         = "technical_exercise"
+
+# Workspaces are named <workspace_name>_<environment>, e.g. myapp_dev
+workspace_name = "myapp"
+environments   = ["dev", "test", "uat", "prod"]
+
+# Repository
+repository           = "my-cdk-repo"
+repository_branch    = "main"
+repository_path      = "cdk"
+repository_connector = "account.github_connector"
+
+# AWS connector
+provider_connector = "account.aws_connector"
+
+provisioner_type = "awscdk"
+
+# Plugin env vars (defaults shown)
+plugin_awscdk_language                = "python"
+plugin_awscdk_language_version        = "3.11"
+plugin_awscdk_package_manager         = "pip"
+plugin_awscdk_package_manager_version = "22.3"
+plugin_tf_version                     = "2.1108.0"
